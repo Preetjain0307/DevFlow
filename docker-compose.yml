@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # MySQL 8.0 Database Container
+  mysql:
+    image: mysql:8.0
+    container_name: devflow-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: devflow_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./database/sample_data.sql:/docker-entrypoint-initdb.d/02_sample_data.sql
+    networks:
+      - devflow-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # DevFlow Java Web Application (Tomcat 9)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devflow-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/devflow_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: root
+      DB_PASS: root
+    ports:
+      - "8080:8080"
+    volumes:
+      - app_uploads:/usr/local/tomcat/uploads
+    networks:
+      - devflow-net
+
+volumes:
+  mysql_data:
+  app_uploads:
+
+networks:
+  devflow-net:
+    driver: bridge
