@@ -7,9 +7,16 @@
             <i class="bi bi-list fs-5"></i>
         </button>
 
-        <span class="fw-semibold text-dark d-none d-sm-inline-block">
-            <i class="bi bi-laptop me-1 text-primary"></i> Developer Collaboration Portal
+        <span class="fw-semibold text-dark d-none d-lg-inline-block">
+            <i class="bi bi-laptop me-1 text-primary"></i> DevFlow Portal
         </span>
+
+        <!-- Quick Spotlight Search Trigger -->
+        <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2 px-3 py-1 rounded-pill df-search-trigger" id="globalSearchTrigger" type="button" data-bs-toggle="modal" data-bs-target="#quickSearchModal" title="Quick Search (Ctrl + K)">
+            <i class="bi bi-search text-muted"></i>
+            <span class="text-muted small d-none d-md-inline">Quick Search...</span>
+            <kbd class="badge bg-secondary bg-opacity-25 text-secondary border font-monospace ms-1 d-none d-md-inline" style="font-size: 0.65rem;">Ctrl K</kbd>
+        </button>
     </div>
 
     <div class="d-flex align-items-center gap-3">
@@ -29,6 +36,13 @@
                 </c:if>
             </ul>
         </div>
+
+        <!-- Academic & Viva Voce Guide Button -->
+        <button class="btn btn-sm btn-outline-warning d-flex align-items-center gap-1 px-2 px-md-3 py-1 rounded-pill df-viva-trigger shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#vivaArchitectureModal" title="Academic Architecture & Viva Voce Defense Guide">
+            <span class="fs-6">🎓</span>
+            <span class="fw-semibold small d-none d-sm-inline">Viva & Architecture</span>
+            <span class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning border-opacity-50 font-monospace d-none d-xl-inline" style="font-size: 0.65rem;">LIVE</span>
+        </button>
 
         <!-- Live Role / Persona Switcher for Teacher Evaluation -->
         <div class="dropdown d-none d-md-inline-block">
@@ -90,6 +104,11 @@
                 </li>
             </ul>
         </div>
+
+        <!-- Dark / Light Theme Toggle -->
+        <button class="btn btn-light position-relative rounded-circle p-2 text-secondary theme-toggle-btn" id="themeToggleBtn" type="button" title="Switch Theme (Dark / Light)" aria-label="Toggle dark/light theme">
+            <i class="bi bi-moon-stars-fill fs-5" id="themeToggleIcon"></i>
+        </button>
 
         <!-- Notifications Dropdown -->
         <a href="${pageContext.request.contextPath}/notifications" class="btn btn-light position-relative rounded-circle p-2 text-secondary" title="Notifications">

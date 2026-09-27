@@ -51,6 +51,9 @@ public class BugController extends HttpServlet {
             case "edit":
                 showEditForm(request, response);
                 break;
+            case "export":
+                exportBugsCsv(request, response);
+                break;
             case "list":
             default:
                 listBugs(request, response);
@@ -72,9 +75,11 @@ public class BugController extends HttpServlet {
                 handleEdit(request, response);
                 break;
             case "status-update":
+            case "updateStatus":
                 handleStatusUpdate(request, response);
                 break;
             case "comment":
+            case "addComment":
                 handleAddComment(request, response);
                 break;
             case "delete":
@@ -257,6 +262,14 @@ public class BugController extends HttpServlet {
         String resolutionNotes = request.getParameter("resolutionNotes");
 
         bugService.updateBugStatus(bugId, status, resolutionNotes, currentUser.getId(), currentUser.getUsername(), request.getRemoteAddr());
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || "true".equals(request.getParameter("ajax"))) {
+            java.util.Map<String, Object> resp = new java.util.HashMap<>();
+            resp.put("success", true);
+            resp.put("status", status);
+            resp.put("resolutionNotes", resolutionNotes != null ? resolutionNotes : "");
+            com.devflow.util.JsonUtil.sendJsonResponse(response, resp);
+            return;
+        }
         response.sendRedirect(request.getContextPath() + "/bugs?action=view&id=" + bugId);
     }
 
@@ -269,6 +282,18 @@ public class BugController extends HttpServlet {
         String comment = request.getParameter("comment");
 
         bugService.addComment(bugId, currentUser.getId(), comment);
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || "true".equals(request.getParameter("ajax"))) {
+            java.util.Map<String, Object> resp = new java.util.HashMap<>();
+            resp.put("success", true);
+            resp.put("authorName", currentUser.getFullName());
+            String initial = currentUser.getFullName() != null && !currentUser.getFullName().isEmpty()
+                    ? currentUser.getFullName().substring(0, 1).toUpperCase() : "U";
+            resp.put("initial", initial);
+            resp.put("createdAt", "Just now");
+            resp.put("comment", comment);
+            com.devflow.util.JsonUtil.sendJsonResponse(response, resp);
+            return;
+        }
         response.sendRedirect(request.getContextPath() + "/bugs?action=view&id=" + bugId);
     }
 
@@ -280,5 +305,44 @@ public class BugController extends HttpServlet {
 
         bugService.deleteBug(bugId, currentUser.getId(), currentUser.getUsername(), request.getRemoteAddr());
         response.sendRedirect(request.getContextPath() + "/bugs");
+    }
+
+    private void exportBugsCsv(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String projectIdStr = request.getParameter("projectId");
+        Integer projectId = (projectIdStr != null && !projectIdStr.trim().isEmpty()) ? Integer.parseInt(projectIdStr.trim()) : null;
+        List<com.devflow.model.Bug> bugs;
+        if (projectId != null) {
+            bugs = bugService.getBugsByProjectId(projectId);
+        } else {
+            bugs = bugService.searchBugs(null, null, null, null, null);
+        }
+
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"devflow_defects_" + System.currentTimeMillis() + ".csv\"");
+
+        try (java.io.PrintWriter writer = response.getWriter()) {
+            writer.write('\ufeff'); // UTF-8 BOM for Excel
+            writer.println("Bug ID,Bug Key,Title,Severity,Priority,Status,Project ID,Assigned To,Reported By,Created At");
+            for (com.devflow.model.Bug b : bugs) {
+                writer.printf("\"%d\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%d\",\"%s\",\"%s\",\"%s\"%n",
+                        b.getId(),
+                        escapeCsv(b.getBugKey()),
+                        escapeCsv(b.getTitle()),
+                        escapeCsv(b.getSeverity()),
+                        escapeCsv(b.getPriority()),
+                        escapeCsv(b.getStatus()),
+                        b.getProjectId(),
+                        escapeCsv(b.getAssigneeName()),
+                        escapeCsv(b.getReporterName()),
+                        b.getCreatedAt() != null ? b.getCreatedAt().toString() : "N/A"
+                );
+            }
+        }
+    }
+
+    private String escapeCsv(String val) {
+        if (val == null) return "";
+        return val.replace("\"", "\"\"");
     }
 }

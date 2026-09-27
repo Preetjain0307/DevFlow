@@ -14,6 +14,7 @@
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-danger">${bug.bugKey}</span>
                     <h1 class="page-title mb-0">${bug.title}</h1>
+                    <span class="badge bg-warning text-dark" id="headerStatusBadge">${bug.status}</span>
                 </div>
                 <p class="page-subtitle mt-1">Project: <a href="${pageContext.request.contextPath}/projects?action=view&id=${bug.projectId}" class="text-decoration-none fw-semibold">${bug.projectName}</a></p>
             </div>
@@ -57,10 +58,10 @@
                 <div class="df-card">
                     <div class="df-card-header py-3 d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 fw-semibold"><i class="bi bi-chat-left-text me-2 text-info"></i>Comments & Triage</h5>
-                        <span class="badge bg-light text-dark border">${comments.size()} Comments</span>
+                        <span class="badge bg-light text-dark border" id="bugCommentCount">${comments.size()} Comments</span>
                     </div>
                     <div class="df-card-body p-3">
-                        <form action="${pageContext.request.contextPath}/bugs" method="POST" class="mb-4">
+                        <form id="bugCommentForm" action="${pageContext.request.contextPath}/bugs" method="POST" class="mb-4">
                             <input type="hidden" name="action" value="addComment">
                             <input type="hidden" name="bugId" value="${bug.bugId}">
                             <div class="mb-2">
@@ -75,7 +76,7 @@
 
                         <hr>
 
-                        <div class="comments-list">
+                        <div class="comments-list" id="bugCommentsList">
                             <c:forEach var="c" items="${comments}">
                                 <div class="d-flex mb-3">
                                     <div class="avatar bg-danger text-white rounded-circle me-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
@@ -105,7 +106,7 @@
                         <h5 class="mb-0 fw-semibold"><i class="bi bi-sliders me-2 text-secondary"></i>Bug Status</h5>
                     </div>
                     <div class="df-card-body p-3">
-                        <form action="${pageContext.request.contextPath}/bugs" method="POST" class="mb-3">
+                        <form id="bugStatusForm" action="${pageContext.request.contextPath}/bugs" method="POST" class="mb-3">
                             <input type="hidden" name="action" value="updateStatus">
                             <input type="hidden" name="bugId" value="${bug.bugId}">
                             <label for="bugStatus" class="form-label small fw-bold">Update Status</label>

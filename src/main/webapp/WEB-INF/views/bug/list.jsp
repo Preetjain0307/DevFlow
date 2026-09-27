@@ -14,9 +14,14 @@
                 <h1 class="page-title">Defects & Bug Tracker</h1>
                 <p class="page-subtitle">Report, triage, assign, and resolve project bugs and issues</p>
             </div>
-            <a href="${pageContext.request.contextPath}/bugs?action=create${projectId != null ? '&projectId='.concat(projectId) : ''}" class="btn btn-danger btn-sm">
-                <i class="bi bi-bug me-1"></i> Report Bug
-            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="${pageContext.request.contextPath}/bugs?action=export${projectId != null ? '&projectId='.concat(projectId) : ''}" class="btn btn-outline-success btn-sm" title="Export Defects to CSV Spreadsheet">
+                    <i class="bi bi-filetype-csv me-1"></i> Export CSV
+                </a>
+                <a href="${pageContext.request.contextPath}/bugs?action=create${projectId != null ? '&projectId='.concat(projectId) : ''}" class="btn btn-danger btn-sm">
+                    <i class="bi bi-bug me-1"></i> Report Bug
+                </a>
+            </div>
         </div>
 
         <jsp:include page="/WEB-INF/views/common/alerts.jsp" />

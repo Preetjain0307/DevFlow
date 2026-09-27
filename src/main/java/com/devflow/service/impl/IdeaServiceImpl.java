@@ -161,8 +161,16 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public boolean castVote(int ideaId, int userId, String username, String vote, String comment, String ipAddress) {
+        if (vote != null) {
+            String v = vote.trim().toUpperCase();
+            if ("UPVOTE".equals(v) || "UP".equals(v) || "LIKE".equals(v) || "YES".equals(v)) {
+                vote = "YES";
+            } else if ("DOWNVOTE".equals(v) || "DOWN".equals(v) || "DISLIKE".equals(v) || "NO".equals(v)) {
+                vote = "NO";
+            }
+        }
         if (!"YES".equalsIgnoreCase(vote) && !"NO".equalsIgnoreCase(vote)) {
-            throw new ValidationException("Vote must be either YES or NO.");
+            throw new ValidationException("Vote must be either YES (Upvote) or NO (Downvote).");
         }
 
         Idea idea = ideaDAO.findById(ideaId);

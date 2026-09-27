@@ -78,11 +78,11 @@
                 <div class="df-card">
                     <div class="df-card-header py-3 d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 fw-semibold"><i class="bi bi-chat-left-dots me-2 text-info"></i>Peer Discussion</h5>
-                        <span class="badge bg-light text-dark border">${comments.size()} Comments</span>
+                        <span class="badge bg-light text-dark border" id="ideaCommentCount">${comments.size()} Comments</span>
                     </div>
                     <div class="df-card-body p-3">
                         <!-- Comment form -->
-                        <form action="${pageContext.request.contextPath}/ideas" method="POST" class="mb-4">
+                        <form id="ideaCommentForm" action="${pageContext.request.contextPath}/ideas" method="POST" class="mb-4">
                             <input type="hidden" name="action" value="addComment">
                             <input type="hidden" name="ideaId" value="${idea.ideaId}">
                             <div class="mb-2">
@@ -98,7 +98,7 @@
                         <hr>
 
                         <!-- Comments list -->
-                        <div class="comments-list">
+                        <div class="comments-list" id="ideaCommentsList">
                             <c:forEach var="c" items="${comments}">
                                 <div class="d-flex mb-3">
                                     <div class="avatar bg-warning text-dark rounded-circle me-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
@@ -131,36 +131,53 @@
                     <div class="df-card-body text-center p-3">
                         <div class="d-flex justify-content-center gap-4 my-3">
                             <div>
-                                <div class="display-6 fw-bold text-success">${idea.upvotes}</div>
+                                <div class="display-6 fw-bold text-success" id="ideaUpvotesCount">${idea.upvotes}</div>
                                 <div class="small text-muted">Upvotes</div>
                             </div>
                             <div class="vr"></div>
                             <div>
-                                <div class="display-6 fw-bold text-danger">${idea.downvotes}</div>
+                                <div class="display-6 fw-bold text-danger" id="ideaDownvotesCount">${idea.downvotes}</div>
                                 <div class="small text-muted">Downvotes</div>
                             </div>
                         </div>
 
                         <!-- Vote Actions -->
                         <c:if test="${idea.status != 'APPROVED' && idea.status != 'REJECTED'}">
-                            <div class="d-flex justify-content-center gap-2 mt-4">
-                                <form action="${pageContext.request.contextPath}/ideas" method="POST" class="d-inline">
+                            <c:set var="userVotedUp" value="${idea.userVote == 'YES' || idea.userVote == 'UPVOTE'}" />
+                            <c:set var="userVotedDown" value="${idea.userVote == 'NO' || idea.userVote == 'DOWNVOTE'}" />
+                            <div class="d-flex justify-content-center gap-2 mt-4" id="voteActionContainer">
+                                <form action="${pageContext.request.contextPath}/ideas" method="POST" class="d-inline ajax-vote-form" data-vote="YES">
                                     <input type="hidden" name="action" value="vote">
                                     <input type="hidden" name="ideaId" value="${idea.ideaId}">
+                                    <input type="hidden" name="vote" value="YES">
                                     <input type="hidden" name="voteType" value="UPVOTE">
-                                    <button type="submit" class="btn btn-outline-success px-3">
+                                    <button type="submit" id="btnVoteUp" class="btn ${userVotedUp ? 'btn-success text-white' : 'btn-outline-success'} px-3 shadow-sm">
                                         <i class="bi bi-hand-thumbs-up-fill me-1"></i> Upvote
                                     </button>
                                 </form>
 
-                                <form action="${pageContext.request.contextPath}/ideas" method="POST" class="d-inline">
+                                <form action="${pageContext.request.contextPath}/ideas" method="POST" class="d-inline ajax-vote-form" data-vote="NO">
                                     <input type="hidden" name="action" value="vote">
                                     <input type="hidden" name="ideaId" value="${idea.ideaId}">
+                                    <input type="hidden" name="vote" value="NO">
                                     <input type="hidden" name="voteType" value="DOWNVOTE">
-                                    <button type="submit" class="btn btn-outline-danger px-3">
+                                    <button type="submit" id="btnVoteDown" class="btn ${userVotedDown ? 'btn-danger text-white' : 'btn-outline-danger'} px-3 shadow-sm">
                                         <i class="bi bi-hand-thumbs-down-fill me-1"></i> Downvote
                                     </button>
                                 </form>
+                            </div>
+                            <div id="userVoteBadge" class="mt-2 small text-muted">
+                                <c:choose>
+                                    <c:when test="${userVotedUp}">
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle me-1"></i>You upvoted this proposal</span>
+                                    </c:when>
+                                    <c:when test="${userVotedDown}">
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="bi bi-x-circle me-1"></i>You downvoted this proposal</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="text-secondary opacity-75">Click to cast your peer vote</span>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                         </c:if>
                     </div>

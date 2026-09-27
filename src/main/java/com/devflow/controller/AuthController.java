@@ -1,11 +1,22 @@
 package com.devflow.controller;
 
 import com.devflow.config.Constants;
+import com.devflow.dao.AuditLogDAO;
+import com.devflow.dao.impl.AuditLogDAOImpl;
 import com.devflow.exception.ValidationException;
+import com.devflow.model.AuditLog;
+import com.devflow.model.Bug;
+import com.devflow.model.Task;
 import com.devflow.model.User;
+import com.devflow.service.BugService;
+import com.devflow.service.TaskService;
 import com.devflow.service.UserService;
+import com.devflow.service.impl.BugServiceImpl;
+import com.devflow.service.impl.TaskServiceImpl;
 import com.devflow.service.impl.UserServiceImpl;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,10 +27,16 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "AuthController", urlPatterns = {"/login", "/register", "/logout", "/profile", "/change-password", "/demo-login"})
 public class AuthController extends HttpServlet {
     private UserService userService;
+    private TaskService taskService;
+    private BugService bugService;
+    private AuditLogDAO auditLogDAO;
 
     @Override
     public void init() throws ServletException {
         this.userService = new UserServiceImpl();
+        this.taskService = new TaskServiceImpl();
+        this.bugService = new BugServiceImpl();
+        this.auditLogDAO = new AuditLogDAOImpl();
     }
 
     @Override
@@ -195,6 +212,15 @@ public class AuthController extends HttpServlet {
         User freshUser = userService.getUserById(currentUser.getId());
         session.setAttribute(Constants.SESSION_USER, freshUser);
         request.setAttribute("user", freshUser);
+
+        List<Task> userTasks = taskService.getTasksByAssignee(freshUser.getId());
+        List<Bug> userBugs = bugService.getBugsByAssignee(freshUser.getId());
+        List<AuditLog> recentAuditLogs = auditLogDAO.findByUserId(freshUser.getId(), 15);
+
+        request.setAttribute("userTasks", userTasks != null ? userTasks : new ArrayList<Task>());
+        request.setAttribute("userBugs", userBugs != null ? userBugs : new ArrayList<Bug>());
+        request.setAttribute("recentAuditLogs", recentAuditLogs != null ? recentAuditLogs : new ArrayList<AuditLog>());
+
         request.getRequestDispatcher("/WEB-INF/views/auth/profile.jsp").forward(request, response);
     }
 
@@ -221,8 +247,7 @@ public class AuthController extends HttpServlet {
             request.setAttribute("error", e.getMessage());
         }
 
-        request.setAttribute("user", currentUser);
-        request.getRequestDispatcher("/WEB-INF/views/auth/profile.jsp").forward(request, response);
+        showProfile(request, response);
     }
 
     private void handleChangePassword(HttpServletRequest request, HttpServletResponse response)

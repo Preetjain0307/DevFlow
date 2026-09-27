@@ -15,6 +15,9 @@
                 <p class="page-subtitle">Manage, assign, and monitor tasks across all active projects</p>
             </div>
             <div class="d-flex align-items-center gap-2">
+                <a href="${pageContext.request.contextPath}/tasks?action=export${projectId != null ? '&projectId='.concat(projectId) : ''}" class="btn btn-outline-success btn-sm" title="Export Tasks to CSV Spreadsheet">
+                    <i class="bi bi-filetype-csv me-1"></i> Export CSV
+                </a>
                 <c:if test="${projectId != null}">
                     <a href="${pageContext.request.contextPath}/tasks?action=kanban&projectId=${projectId}" class="btn btn-outline-secondary btn-sm">
                         <i class="bi bi-kanban me-1"></i> Kanban Board

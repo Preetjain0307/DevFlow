@@ -18,13 +18,48 @@
     --df-dark-sidebar: #0f172a;
     --df-dark-sidebar-hover: #1e293b;
     --df-card-bg: #ffffff;
+    --df-card-header-bg: #ffffff;
     --df-body-bg: #f8fafc;
+    --df-navbar-bg: #ffffff;
     --df-border: #e2e8f0;
     --df-text-main: #1e293b;
+    --df-text-title: #0f172a;
     --df-text-muted: #64748b;
+    --df-kanban-col-bg: #f1f5f9;
+    --df-table-th-bg: #f8fafc;
+    --df-table-hover-bg: #f8fafc;
+    --df-input-bg: #ffffff;
+    --df-input-border: #cbd5e1;
     --df-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --df-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --df-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+[data-bs-theme="dark"],
+[data-theme="dark"] {
+    --df-dark-sidebar: #090d16;
+    --df-dark-sidebar-hover: #172033;
+    --df-card-bg: #1e293b;
+    --df-card-header-bg: #1e293b;
+    --df-body-bg: #0f172a;
+    --df-navbar-bg: #1e293b;
+    --df-border: #334155;
+    --df-text-main: #cbd5e1;
+    --df-text-title: #f8fafc;
+    --df-text-muted: #94a3b8;
+    --df-kanban-col-bg: #131c2e;
+    --df-table-th-bg: #172033;
+    --df-table-hover-bg: #253349;
+    --df-input-bg: #0f172a;
+    --df-input-border: #334155;
+    --df-primary-light: rgba(79, 70, 229, 0.2);
+    --df-success-light: rgba(16, 185, 129, 0.2);
+    --df-warning-light: rgba(245, 158, 11, 0.2);
+    --df-danger-light: rgba(239, 68, 68, 0.2);
+    --df-info-light: rgba(6, 182, 212, 0.2);
+    --df-shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+    --df-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+    --df-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
 }
 
 body {
@@ -34,6 +69,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* ------------------------------------------------------------
@@ -137,7 +173,7 @@ body {
    Navbar
    ------------------------------------------------------------ */
 .top-navbar {
-    background-color: #ffffff;
+    background-color: var(--df-navbar-bg);
     border-bottom: 1px solid var(--df-border);
     padding: 0.75rem 1.5rem;
     display: flex;
@@ -145,6 +181,7 @@ body {
     justify-content: space-between;
     height: 64px;
     box-shadow: var(--df-shadow-sm);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .nav-user-badge {
@@ -185,7 +222,7 @@ body {
 .page-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--df-text-title);
     margin-bottom: 0.25rem;
 }
 
@@ -200,7 +237,7 @@ body {
     border-radius: 0.75rem;
     box-shadow: var(--df-shadow-sm);
     margin-bottom: 1.5rem;
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.25s ease;
 }
 
 .df-card:hover {
@@ -213,15 +250,16 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #ffffff;
+    background-color: var(--df-card-header-bg);
     border-top-left-radius: 0.75rem;
     border-top-right-radius: 0.75rem;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .df-card-title {
     font-size: 1rem;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--df-text-title);
     margin: 0;
     display: flex;
     align-items: center;
@@ -236,7 +274,7 @@ body {
    Stat / Metric Cards
    ------------------------------------------------------------ */
 .stat-card {
-    background: #ffffff;
+    background: var(--df-card-bg);
     border: 1px solid var(--df-border);
     border-radius: 0.75rem;
     padding: 1.25rem;
@@ -246,7 +284,7 @@ body {
     gap: 1rem;
     position: relative;
     overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .stat-card:hover {
@@ -274,7 +312,7 @@ body {
 .stat-value {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--df-text-title);
     line-height: 1.2;
 }
 
@@ -287,12 +325,12 @@ body {
 /* ------------------------------------------------------------
    Badges & Labels
    ------------------------------------------------------------ */
-.badge-soft-primary { background-color: #eef2ff; color: var(--df-primary); font-weight: 600; }
-.badge-soft-success { background-color: #ecfdf5; color: #047857; font-weight: 600; }
-.badge-soft-warning { background-color: #fffbeb; color: #b45309; font-weight: 600; }
-.badge-soft-danger { background-color: #fef2f2; color: #b91c1c; font-weight: 600; }
-.badge-soft-info { background-color: #ecfeff; color: #0e7490; font-weight: 600; }
-.badge-soft-secondary { background-color: #f1f5f9; color: #475569; font-weight: 600; }
+.badge-soft-primary { background-color: var(--df-primary-light); color: var(--df-primary); font-weight: 600; }
+.badge-soft-success { background-color: var(--df-success-light); color: var(--df-success); font-weight: 600; }
+.badge-soft-warning { background-color: var(--df-warning-light); color: var(--df-warning); font-weight: 600; }
+.badge-soft-danger { background-color: var(--df-danger-light); color: var(--df-danger); font-weight: 600; }
+.badge-soft-info { background-color: var(--df-info-light); color: var(--df-info); font-weight: 600; }
+.badge-soft-secondary { background-color: var(--df-table-th-bg); color: var(--df-text-muted); font-weight: 600; }
 
 /* ------------------------------------------------------------
    Kanban Board
@@ -306,13 +344,14 @@ body {
 }
 
 .kanban-column {
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
+    background: var(--df-kanban-col-bg);
+    border: 1px solid var(--df-border);
     border-radius: 0.75rem;
     padding: 1rem;
     display: flex;
     flex-direction: column;
     min-height: 550px;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .kanban-column-header {
@@ -334,7 +373,7 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #334155;
+    color: var(--df-text-title);
     margin: 0;
     display: flex;
     align-items: center;
@@ -346,21 +385,50 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    transition: background-color 0.2s ease, outline-color 0.2s ease;
+}
+
+.kanban-droppable.drag-over,
+.kanban-cards-container.drag-over {
+    background-color: rgba(79, 70, 229, 0.08) !important;
+    outline: 2px dashed var(--df-primary) !important;
+    outline-offset: -3px;
+    border-radius: 0.5rem;
+}
+
+[data-bs-theme="dark"] .kanban-droppable.drag-over,
+[data-bs-theme="dark"] .kanban-cards-container.drag-over {
+    background-color: rgba(79, 70, 229, 0.2) !important;
+    outline: 2px dashed #818cf8 !important;
+}
+
+.kanban-empty-hint {
+    border: 2px dashed var(--df-border);
+    border-radius: 0.5rem;
+    background-color: transparent;
+    pointer-events: none;
+    transition: all 0.2s ease;
 }
 
 .kanban-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--df-card-bg);
+    border: 1px solid var(--df-border);
     border-radius: 0.5rem;
     padding: 0.875rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     cursor: grab;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.25s ease, border-color 0.25s ease, opacity 0.2s ease;
 }
 
 .kanban-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.kanban-card.is-dragging {
+    opacity: 0.35 !important;
+    transform: scale(0.96);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
 .kanban-card:active {
@@ -370,7 +438,7 @@ body {
 .kanban-card-title {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--df-text-title);
     margin-bottom: 0.5rem;
 }
 
@@ -386,7 +454,7 @@ body {
    Idea Voting & Proposal System UI
    ------------------------------------------------------------ */
 .vote-panel {
-    background: #f8fafc;
+    background: var(--df-card-bg);
     border: 1px solid var(--df-border);
     border-radius: 0.75rem;
     padding: 1.25rem;
@@ -395,7 +463,7 @@ body {
 .vote-meter {
     height: 12px;
     border-radius: 6px;
-    background-color: #e2e8f0;
+    background-color: var(--df-border);
     overflow: hidden;
     display: flex;
     margin: 0.75rem 0;
@@ -407,18 +475,18 @@ body {
 .faculty-decision-box {
     border-left: 4px solid var(--df-primary);
     padding: 1rem;
-    background: #eef2ff;
+    background: var(--df-primary-light);
     border-radius: 0 0.5rem 0.5rem 0;
 }
 
 .faculty-decision-box.approved {
     border-left-color: var(--df-success);
-    background: #ecfdf5;
+    background: var(--df-success-light);
 }
 
 .faculty-decision-box.rejected {
     border-left-color: var(--df-danger);
-    background: #fef2f2;
+    background: var(--df-danger-light);
 }
 
 /* ------------------------------------------------------------
@@ -429,8 +497,8 @@ body {
 }
 
 .df-table th {
-    background-color: #f8fafc;
-    color: #475569;
+    background-color: var(--df-table-th-bg);
+    color: var(--df-text-title);
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -444,10 +512,11 @@ body {
     vertical-align: middle;
     border-bottom: 1px solid var(--df-border);
     font-size: 0.875rem;
+    color: var(--df-text-main);
 }
 
 .df-table tr:hover td {
-    background-color: #f8fafc;
+    background-color: var(--df-table-hover-bg);
 }
 
 /* ------------------------------------------------------------
@@ -468,14 +537,271 @@ body {
 }
 
 .form-control, .form-select {
+    background-color: var(--df-input-bg);
+    color: var(--df-text-main);
     border-radius: 0.5rem;
-    border-color: var(--df-border);
+    border-color: var(--df-input-border);
     font-size: 0.875rem;
+    transition: background-color 0.25s ease, border-color 0.2s ease, color 0.25s ease;
 }
 
 .form-control:focus, .form-select:focus {
+    background-color: var(--df-input-bg);
+    color: var(--df-text-main);
     border-color: var(--df-primary);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* ------------------------------------------------------------
+   Theme Switcher Button
+   ------------------------------------------------------------ */
+.theme-toggle-btn {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid var(--df-border);
+    background-color: var(--df-card-bg);
+    color: var(--df-text-muted);
+    transition: all 0.25s ease;
+}
+
+.theme-toggle-btn:hover {
+    color: var(--df-primary);
+    border-color: var(--df-primary);
+    transform: scale(1.08);
+}
+
+.theme-toggle-btn i {
+    display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-toggle-btn:active i {
+    transform: rotate(360deg);
+}
+
+/* ------------------------------------------------------------
+   Dark Theme Component & Bootstrap Overrides
+   ------------------------------------------------------------ */
+[data-bs-theme="dark"],
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+[data-bs-theme="dark"] .text-dark,
+[data-theme="dark"] .text-dark {
+    color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .bg-light,
+[data-theme="dark"] .bg-light {
+    background-color: var(--df-kanban-col-bg) !important;
+    color: var(--df-text-main) !important;
+}
+
+[data-bs-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-white {
+    background-color: var(--df-card-bg) !important;
+}
+
+[data-bs-theme="dark"] .border,
+[data-theme="dark"] .border {
+    border-color: var(--df-border) !important;
+}
+
+[data-bs-theme="dark"] .card,
+[data-theme="dark"] .card {
+    background-color: var(--df-card-bg);
+    border-color: var(--df-border);
+    color: var(--df-text-main);
+}
+
+[data-bs-theme="dark"] .dropdown-menu,
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--df-card-bg);
+    border: 1px solid var(--df-border);
+    color: var(--df-text-main);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.55) !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item,
+[data-theme="dark"] .dropdown-item {
+    color: var(--df-text-main);
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover,
+[data-bs-theme="dark"] .dropdown-item:focus,
+[data-theme="dark"] .dropdown-item:hover,
+[data-theme="dark"] .dropdown-item:focus {
+    background-color: #26334a;
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .dropdown-divider,
+[data-theme="dark"] .dropdown-divider {
+    border-color: var(--df-border);
+}
+
+[data-bs-theme="dark"] .dropdown-header,
+[data-theme="dark"] .dropdown-header {
+    color: var(--df-text-muted);
+}
+
+[data-bs-theme="dark"] .btn-light,
+[data-theme="dark"] .btn-light {
+    background-color: #1e293b;
+    border-color: var(--df-border);
+    color: var(--df-text-main);
+}
+
+[data-bs-theme="dark"] .btn-light:hover,
+[data-theme="dark"] .btn-light:hover {
+    background-color: #2d3b55;
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary,
+[data-theme="dark"] .btn-outline-secondary {
+    border-color: var(--df-border);
+    color: var(--df-text-muted);
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover,
+[data-theme="dark"] .btn-outline-secondary:hover {
+    background-color: #2d3b55;
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .modal-content,
+[data-theme="dark"] .modal-content {
+    background-color: var(--df-card-bg);
+    border: 1px solid var(--df-border);
+    color: var(--df-text-main);
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer,
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: var(--df-border);
+}
+
+[data-bs-theme="dark"] .btn-close,
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-bs-theme="dark"] .table,
+[data-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--df-text-main);
+    --bs-table-border-color: var(--df-border);
+}
+
+[data-bs-theme="dark"] .kanban-droppable,
+[data-theme="dark"] .kanban-droppable {
+    background-color: #131c2e !important;
+}
+
+[data-bs-theme="dark"] .kanban-header,
+[data-theme="dark"] .kanban-header {
+    background-color: var(--df-card-bg) !important;
+    color: var(--df-text-title) !important;
+}
+
+/* ------------------------------------------------------------
+   Global Spotlight Quick Search (Ctrl + K)
+   ------------------------------------------------------------ */
+.df-search-trigger {
+    background-color: var(--df-card-bg);
+    border: 1px solid var(--df-border);
+    transition: all 0.2s ease;
+}
+
+.df-search-trigger:hover {
+    border-color: var(--df-primary);
+    background-color: var(--df-card-bg);
+    transform: translateY(-1px);
+    box-shadow: var(--df-shadow-sm);
+}
+
+.df-search-result-item {
+    background-color: var(--df-card-bg);
+    color: var(--df-text-main);
+    transition: background-color 0.15s ease;
+}
+
+.df-search-result-item:hover,
+.df-search-result-item.active {
+    background-color: var(--df-primary-light) !important;
+    color: var(--df-text-title) !important;
+}
+
+[data-bs-theme="dark"] .df-search-result-item:hover,
+[data-bs-theme="dark"] .df-search-result-item.active {
+    background-color: rgba(79, 70, 229, 0.25) !important;
+    color: #ffffff !important;
+}
+
+/* ------------------------------------------------------------
+   Academic Architecture & Viva Voce Modal
+   ------------------------------------------------------------ */
+.df-viva-trigger {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.15));
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    color: #d97706;
+    transition: all 0.2s ease;
+}
+
+.df-viva-trigger:hover {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.25));
+    border-color: #f59e0b;
+    color: #b45309;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+[data-bs-theme="dark"] .df-viva-trigger {
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.35);
+}
+
+[data-bs-theme="dark"] .df-viva-trigger:hover {
+    color: #fef08a;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.spin-animation {
+    display: inline-block;
+    animation: spin 0.75s linear infinite;
+}
+
+.shadow-xs {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="dark"] #vivaArchitectureModal .card,
+[data-bs-theme="dark"] #vivaArchitectureModal .accordion-item {
+    background-color: var(--df-card-bg);
+    border-color: var(--df-border) !important;
+}
+
+[data-bs-theme="dark"] #vivaArchitectureModal .accordion-button {
+    background-color: var(--df-card-bg);
+    color: var(--df-text-title);
+}
+
+[data-bs-theme="dark"] #vivaArchitectureModal .accordion-button:not(.collapsed) {
+    background-color: rgba(79, 70, 229, 0.15);
+    color: #818cf8;
 }
 
 /* ------------------------------------------------------------
@@ -502,4 +828,104 @@ body {
     .page-container {
         padding: 1rem;
     }
+}
+
+/* ------------------------------------------------------------
+   Print Media Stylesheet for Executive Reports (PDF Export)
+   ------------------------------------------------------------ */
+@media print {
+    /* Hide navigation, sidebars, interactive controls, and modals */
+    .sidebar,
+    .top-navbar,
+    .page-header .d-print-none,
+    .df-card-header .btn,
+    .btn,
+    button,
+    #sidebarToggleBtn,
+    #themeToggleBtn,
+    .modal,
+    .modal-backdrop,
+    .toast-container,
+    .df-toast,
+    #quickSearchModal,
+    #vivaArchitectureModal {
+        display: none !important;
+    }
+
+    /* Reset layouts for paper / PDF page margins */
+    html, body, .app-wrapper, .main-content, .page-container {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #111827 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    .page-container {
+        padding: 1.5cm !important;
+    }
+
+    /* Cards & Containers */
+    .df-card, .card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        page-break-inside: avoid;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .df-card-header {
+        background-color: #f8fafc !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+    }
+
+    /* Tables */
+    .table {
+        color: #111827 !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    .table-light, thead th {
+        background-color: #f1f5f9 !important;
+        color: #1e293b !important;
+        border-bottom: 2px solid #94a3b8 !important;
+    }
+
+    /* Preserve badges with clear borders */
+    .badge {
+        border: 1px solid #64748b !important;
+        color: #1e293b !important;
+        background: transparent !important;
+        font-weight: 600 !important;
+    }
+
+    /* Prevent awkward chart cutoffs across pages */
+    canvas {
+        max-width: 100% !important;
+        page-break-inside: avoid;
+    }
+}
+
+/* ------------------------------------------------------------
+   Smooth Activity & Comment Animation (Feature 3.2)
+   ------------------------------------------------------------ */
+@keyframes slideDownFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-slide {
+    animation: slideDownFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

@@ -20,7 +20,8 @@ import javax.servlet.http.HttpSession;
 
 @WebServlet(name = "AdminController", urlPatterns = {
         "/admin", "/admin/users", "/admin/user-status",
-        "/admin/user-role", "/admin/audit-logs", "/admin/settings"
+        "/admin/user-role", "/admin/audit-logs", "/admin/settings",
+        "/admin/system-health"
 })
 public class AdminController extends HttpServlet {
     private UserService userService;
@@ -46,6 +47,7 @@ public class AdminController extends HttpServlet {
             case "/admin/audit-logs":
                 showAuditLogs(request, response);
                 break;
+            case "/admin/system-health":
             case "/admin/settings":
                 showSettings(request, response);
                 break;

@@ -68,6 +68,9 @@ public class TaskController extends HttpServlet {
             case "edit":
                 showEditForm(request, response);
                 break;
+            case "export":
+                exportTasksCsv(request, response);
+                break;
             case "list":
             default:
                 listTasks(request, response);
@@ -99,9 +102,11 @@ public class TaskController extends HttpServlet {
                 handleDelete(request, response);
                 break;
             case "comment":
+            case "addComment":
                 handleAddComment(request, response);
                 break;
             case "status-update":
+            case "updateStatus":
                 handleStatusUpdateForm(request, response);
                 break;
             default:
@@ -349,6 +354,13 @@ public class TaskController extends HttpServlet {
         String status = request.getParameter("status");
 
         taskService.updateTaskStatus(taskId, status, currentUser.getId(), currentUser.getUsername(), request.getRemoteAddr());
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || "true".equals(request.getParameter("ajax"))) {
+            java.util.Map<String, Object> resp = new java.util.HashMap<>();
+            resp.put("success", true);
+            resp.put("status", status);
+            com.devflow.util.JsonUtil.sendJsonResponse(response, resp);
+            return;
+        }
         response.sendRedirect(request.getContextPath() + "/tasks?action=view&id=" + taskId);
     }
 
@@ -372,6 +384,57 @@ public class TaskController extends HttpServlet {
         String comment = request.getParameter("comment");
 
         taskService.addComment(taskId, currentUser.getId(), comment);
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || "true".equals(request.getParameter("ajax"))) {
+            java.util.Map<String, Object> resp = new java.util.HashMap<>();
+            resp.put("success", true);
+            resp.put("authorName", currentUser.getFullName());
+            String initial = currentUser.getFullName() != null && !currentUser.getFullName().isEmpty()
+                    ? currentUser.getFullName().substring(0, 1).toUpperCase() : "U";
+            resp.put("initial", initial);
+            resp.put("createdAt", "Just now");
+            resp.put("comment", comment);
+            com.devflow.util.JsonUtil.sendJsonResponse(response, resp);
+            return;
+        }
         response.sendRedirect(request.getContextPath() + "/tasks?action=view&id=" + taskId);
+    }
+
+    private void exportTasksCsv(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String projectIdStr = request.getParameter("projectId");
+        Integer projectId = (projectIdStr != null && !projectIdStr.trim().isEmpty()) ? Integer.parseInt(projectIdStr.trim()) : null;
+        List<com.devflow.model.Task> tasks;
+        if (projectId != null) {
+            tasks = taskService.getTasksByProjectId(projectId);
+        } else {
+            tasks = taskService.searchTasks(null, null, null, null, null, null);
+        }
+
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"devflow_tasks_" + System.currentTimeMillis() + ".csv\"");
+
+        try (java.io.PrintWriter writer = response.getWriter()) {
+            writer.write('\ufeff'); // UTF-8 BOM for Excel
+            writer.println("Task ID,Task Key,Title,Type,Priority,Status,Estimated Hours,Assigned To,Due Date,Created At");
+            for (com.devflow.model.Task t : tasks) {
+                writer.printf("\"%d\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
+                        t.getId(),
+                        escapeCsv(t.getTaskKey()),
+                        escapeCsv(t.getTitle()),
+                        escapeCsv(t.getTaskType()),
+                        escapeCsv(t.getPriority()),
+                        escapeCsv(t.getStatus()),
+                        t.getEstimatedHours() != null ? t.getEstimatedHours().toString() : "0",
+                        escapeCsv(t.getAssigneeName()),
+                        t.getDueDate() != null ? t.getDueDate().toString() : "N/A",
+                        t.getCreatedAt() != null ? t.getCreatedAt().toString() : "N/A"
+                );
+            }
+        }
+    }
+
+    private String escapeCsv(String val) {
+        if (val == null) return "";
+        return val.replace("\"", "\"\"");
     }
 }

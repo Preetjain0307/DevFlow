@@ -362,7 +362,8 @@ public class IdeaDAOImpl implements IdeaDAO {
             ps.setInt(2, vote.getUserId());
             ps.setString(3, vote.getVote());
             ps.setString(4, vote.getComments());
-            return ps.executeUpdate() > 0;
+            ps.executeUpdate();
+            return true;
         } catch (SQLException e) {
             logger.error("Error casting vote: {}", e.getMessage());
             throw new DatabaseException("Failed to record vote", e);

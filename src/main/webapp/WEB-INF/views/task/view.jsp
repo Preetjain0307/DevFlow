@@ -14,6 +14,7 @@
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-secondary">${task.taskKey}</span>
                     <h1 class="page-title mb-0">${task.title}</h1>
+                    <span class="badge bg-primary" id="headerStatusBadge">${task.status}</span>
                 </div>
                 <p class="page-subtitle mt-1">Project: <a href="${pageContext.request.contextPath}/projects?action=view&id=${task.projectId}" class="text-decoration-none fw-semibold">${task.projectName}</a></p>
             </div>
@@ -53,11 +54,11 @@
                 <div class="df-card mb-4">
                     <div class="df-card-header py-3 d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 fw-semibold"><i class="bi bi-chat-left-dots me-2 text-info"></i>Activity & Discussion</h5>
-                        <span class="badge bg-light text-dark border">${comments.size()} Comments</span>
+                        <span class="badge bg-light text-dark border" id="taskCommentCount">${comments.size()} Comments</span>
                     </div>
                     <div class="df-card-body p-3">
                         <!-- New Comment Form -->
-                        <form action="${pageContext.request.contextPath}/tasks" method="POST" class="mb-4">
+                        <form id="taskCommentForm" action="${pageContext.request.contextPath}/tasks" method="POST" class="mb-4">
                             <input type="hidden" name="action" value="addComment">
                             <input type="hidden" name="taskId" value="${task.taskId}">
                             <div class="mb-2">
@@ -73,7 +74,7 @@
                         <hr>
 
                         <!-- Comments List -->
-                        <div class="comments-list">
+                        <div class="comments-list" id="taskCommentsList">
                             <c:forEach var="c" items="${comments}">
                                 <div class="d-flex mb-3">
                                     <div class="avatar bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
@@ -104,7 +105,7 @@
                         <h5 class="mb-0 fw-semibold"><i class="bi bi-sliders me-2 text-secondary"></i>Workflow Status</h5>
                     </div>
                     <div class="df-card-body p-3">
-                        <form action="${pageContext.request.contextPath}/tasks" method="POST" class="mb-3">
+                        <form id="taskStatusForm" action="${pageContext.request.contextPath}/tasks" method="POST" class="mb-3">
                             <input type="hidden" name="action" value="updateStatus">
                             <input type="hidden" name="taskId" value="${task.taskId}">
                             <label for="quickStatus" class="form-label small fw-bold">Current Status</label>

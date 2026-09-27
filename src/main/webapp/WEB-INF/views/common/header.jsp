@@ -9,6 +9,17 @@
     <meta name="description" content="DevFlow - Centralized Developer Collaboration Platform">
     <title><c:out value="${pageTitle != null ? pageTitle : 'DevFlow'}"/> | DevFlow Collaboration Platform</title>
 
+    <!-- Immediate Theme Initialization (Prevents FOUC) -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('devflow-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-bs-theme', savedTheme);
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } catch (e) {}
+        })();
+    </script>
+
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -48,9 +48,14 @@ public class SprintController extends HttpServlet {
         request.setAttribute("sprints", sprintService.getSprintsByProjectId(projectId));
 
         if ("view".equals(action)) {
-            int sprintId = Integer.parseInt(request.getParameter("id"));
-            request.setAttribute("selectedSprint", sprintService.getSprintById(sprintId));
-            request.setAttribute("sprintTasks", taskService.getTasksBySprintId(sprintId));
+            String sprintIdStr = request.getParameter("id");
+            if (sprintIdStr != null && !sprintIdStr.isEmpty()) {
+                try {
+                    int sprintId = Integer.parseInt(sprintIdStr);
+                    request.setAttribute("selectedSprint", sprintService.getSprintById(sprintId));
+                    request.setAttribute("sprintTasks", taskService.getTasksBySprintId(sprintId));
+                } catch (NumberFormatException ignored) {}
+            }
         }
 
         request.getRequestDispatcher("/WEB-INF/views/task/sprints.jsp").forward(request, response);

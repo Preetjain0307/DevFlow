@@ -86,6 +86,18 @@ public class MeetingController extends HttpServlet {
             case "delete":
                 handleDelete(request, response);
                 break;
+            case "saveNotes":
+                handleSaveNotes(request, response);
+                break;
+            case "generateAISummary":
+                handleAiSummary(request, response);
+                break;
+            case "addActionItem":
+                handleAddActionItem(request, response);
+                break;
+            case "completeActionItem":
+                handleCompleteActionItem(request, response);
+                break;
             default:
                 response.sendRedirect(request.getContextPath() + "/meetings");
                 break;
@@ -122,7 +134,21 @@ public class MeetingController extends HttpServlet {
         }
 
         request.setAttribute("meeting", meeting);
-        request.setAttribute("projectUsers", userService.getProjectUsers(meeting.getProjectId()));
+        List<User> pUsers = userService.getProjectUsers(meeting.getProjectId());
+        request.setAttribute("projectUsers", pUsers);
+        request.setAttribute("users", pUsers);
+
+        MeetingNote note = meetingService.getMeetingNotes(id);
+        request.setAttribute("note", note);
+        if (note != null) {
+            List<MeetingNote> noteList = new ArrayList<>();
+            noteList.add(note);
+            request.setAttribute("notes", noteList);
+        } else {
+            request.setAttribute("notes", new ArrayList<MeetingNote>());
+        }
+
+        request.setAttribute("actionItems", meetingService.getActionItems(id));
         request.getRequestDispatcher("/WEB-INF/views/meeting/view.jsp").forward(request, response);
     }
 
@@ -207,12 +233,91 @@ public class MeetingController extends HttpServlet {
         int meetingId = Integer.parseInt(request.getParameter("meetingId"));
         String rawNotes = request.getParameter("rawNotes");
 
+        if (rawNotes == null || rawNotes.trim().isEmpty()) {
+            MeetingNote existing = meetingService.getMeetingNotes(meetingId);
+            if (existing != null && existing.getRawNotes() != null) {
+                rawNotes = existing.getRawNotes();
+            }
+        }
+
         try {
-            meetingService.generateAndSaveAiSummary(meetingId, rawNotes, currentUser.getId());
+            MeetingNote note = meetingService.generateAndSaveAiSummary(meetingId, rawNotes, currentUser.getId());
+            if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || "true".equals(request.getParameter("ajax"))) {
+                response.setContentType("application/json;charset=UTF-8");
+                String json = "{\"success\":true,\"summary\":\"" + escapeJson(note.getAiSummary()) + "\"," +
+                        "\"decisions\":\"" + escapeJson(note.getAiDecisions()) + "\"," +
+                        "\"actionItems\":\"" + escapeJson(note.getAiActionItems()) + "\"," +
+                        "\"responsibilities\":\"" + escapeJson(note.getAiResponsibilities()) + "\"}";
+                response.getWriter().write(json);
+                return;
+            }
             response.sendRedirect(request.getContextPath() + "/meetings?action=view&id=" + meetingId + "&summary=generated");
+        } catch (Exception e) {
+            if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || "true".equals(request.getParameter("ajax"))) {
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"success\":false,\"error\":\"" + escapeJson(e.getMessage()) + "\"}");
+                return;
+            }
+            response.sendRedirect(request.getContextPath() + "/meetings?action=view&id=" + meetingId + "&error=" + java.net.URLEncoder.encode(e.getMessage(), "UTF-8"));
+        }
+    }
+
+    private void handleSaveNotes(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute(Constants.SESSION_USER);
+
+        int meetingId = Integer.parseInt(request.getParameter("meetingId"));
+        String rawNotes = request.getParameter("rawNotes");
+
+        try {
+            meetingService.saveMeetingNotes(meetingId, rawNotes, currentUser.getId());
+            if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || "true".equals(request.getParameter("ajax"))) {
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"success\":true,\"message\":\"Notes saved successfully\"}");
+                return;
+            }
+            response.sendRedirect(request.getContextPath() + "/meetings?action=view&id=" + meetingId + "&saved=true");
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/meetings?action=view&id=" + meetingId + "&error=" + java.net.URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
+    }
+
+    private void handleAddActionItem(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        int meetingId = Integer.parseInt(request.getParameter("meetingId"));
+        String description = request.getParameter("description");
+        String assignedToStr = request.getParameter("assigneeId");
+        if (assignedToStr == null || assignedToStr.isEmpty()) {
+            assignedToStr = request.getParameter("assignedTo");
+        }
+        String dueDateStr = request.getParameter("dueDate");
+
+        MeetingActionItem item = new MeetingActionItem();
+        item.setMeetingId(meetingId);
+        item.setDescription(description);
+        if (assignedToStr != null && !assignedToStr.isEmpty()) {
+            item.setAssignedTo(Integer.parseInt(assignedToStr));
+        }
+        if (dueDateStr != null && !dueDateStr.isEmpty()) {
+            item.setDueDate(DateUtil.parseDate(dueDateStr));
+        }
+        item.setCompleted(false);
+
+        meetingService.addActionItem(item);
+        response.sendRedirect(request.getContextPath() + "/meetings?action=view&id=" + meetingId);
+    }
+
+    private void handleCompleteActionItem(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        int meetingId = Integer.parseInt(request.getParameter("meetingId"));
+        String actionItemIdStr = request.getParameter("actionItemId");
+        if (actionItemIdStr == null || actionItemIdStr.isEmpty()) {
+            actionItemIdStr = request.getParameter("itemId");
+        }
+        int itemId = Integer.parseInt(actionItemIdStr);
+        meetingService.toggleActionItem(itemId, true);
+        response.sendRedirect(request.getContextPath() + "/meetings?action=view&id=" + meetingId);
     }
 
     private void handleActionItem(HttpServletRequest request, HttpServletResponse response)
@@ -221,18 +326,8 @@ public class MeetingController extends HttpServlet {
         int meetingId = Integer.parseInt(request.getParameter("meetingId"));
 
         if ("add".equals(action)) {
-            String description = request.getParameter("description");
-            String assignedToStr = request.getParameter("assignedTo");
-            String dueDateStr = request.getParameter("dueDate");
-
-            MeetingActionItem item = new MeetingActionItem();
-            item.setMeetingId(meetingId);
-            item.setDescription(description);
-            if (assignedToStr != null && !assignedToStr.isEmpty()) item.setAssignedTo(Integer.parseInt(assignedToStr));
-            item.setDueDate(DateUtil.parseDate(dueDateStr));
-            item.setCompleted(false);
-
-            meetingService.addActionItem(item);
+            handleAddActionItem(request, response);
+            return;
         } else if ("toggle".equals(action)) {
             int itemId = Integer.parseInt(request.getParameter("itemId"));
             boolean completed = Boolean.parseBoolean(request.getParameter("completed"));
@@ -240,6 +335,17 @@ public class MeetingController extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + "/meetings?action=view&id=" + meetingId);
+    }
+
+    private String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 
     private void handleStatusUpdate(HttpServletRequest request, HttpServletResponse response)

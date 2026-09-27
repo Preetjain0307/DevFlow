@@ -157,6 +157,18 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
+    public boolean saveMeetingNotes(int meetingId, String rawNotes, int userId) {
+        MeetingNote existing = meetingDAO.findNotesByMeetingId(meetingId);
+        if (existing == null) {
+            existing = new MeetingNote();
+            existing.setMeetingId(meetingId);
+        }
+        existing.setRawNotes(rawNotes);
+        existing.setUpdatedBy(userId);
+        return meetingDAO.saveNotes(existing);
+    }
+
+    @Override
     public MeetingNote generateAndSaveAiSummary(int meetingId, String rawNotes, int userId) {
         if (!ValidationUtil.isNotEmpty(rawNotes)) {
             throw new ValidationException("Raw meeting notes are required to generate AI summary.");

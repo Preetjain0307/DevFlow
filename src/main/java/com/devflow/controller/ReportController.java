@@ -70,6 +70,8 @@ public class ReportController extends HttpServlet {
         request.setAttribute("taskStats", taskDAO.getStatusDistributionByProject(projectId));
         request.setAttribute("bugStats", bugDAO.getSeverityDistributionByProject(projectId));
         request.setAttribute("ideaStats", ideaDAO.getStatusDistributionByProject(projectId));
+        request.setAttribute("projectTasks", taskDAO.findByProjectId(projectId));
+        request.setAttribute("projectBugs", bugDAO.findByProjectId(projectId));
 
         request.getRequestDispatcher("/WEB-INF/views/report/index.jsp").forward(request, response);
     }

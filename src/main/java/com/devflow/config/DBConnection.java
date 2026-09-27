@@ -41,6 +41,10 @@ public class DBConnection {
         }
     }
 
+    public static HikariDataSource getDataSource() {
+        return dataSource;
+    }
+
     public static Connection getConnection() throws SQLException {
         if (dataSource == null || dataSource.isClosed()) {
             throw new SQLException("Database connection pool is not initialized or closed.");

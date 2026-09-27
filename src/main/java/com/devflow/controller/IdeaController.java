@@ -84,6 +84,13 @@ public class IdeaController extends HttpServlet {
             case "delete":
                 handleDelete(request, response);
                 break;
+            case "vote":
+                handleVote(request, response);
+                break;
+            case "comment":
+            case "addComment":
+                handleAddComment(request, response);
+                break;
             default:
                 response.sendRedirect(request.getContextPath() + "/ideas");
                 break;
@@ -212,12 +219,40 @@ public class IdeaController extends HttpServlet {
 
         int ideaId = Integer.parseInt(request.getParameter("ideaId"));
         String vote = request.getParameter("vote");
+        if (vote == null || vote.isEmpty()) {
+            vote = request.getParameter("voteType");
+        }
+        if (vote != null) {
+            String v = vote.trim().toUpperCase();
+            if ("UPVOTE".equals(v) || "UP".equals(v) || "LIKE".equals(v) || "YES".equals(v)) {
+                vote = "YES";
+            } else if ("DOWNVOTE".equals(v) || "DOWN".equals(v) || "DISLIKE".equals(v) || "NO".equals(v)) {
+                vote = "NO";
+            }
+        }
         String comment = request.getParameter("comment");
 
+        boolean success = false;
+        String errorMessage = null;
         try {
-            ideaService.castVote(ideaId, currentUser.getId(), currentUser.getUsername(), vote, comment, request.getRemoteAddr());
+            success = ideaService.castVote(ideaId, currentUser.getId(), currentUser.getUsername(), vote, comment, request.getRemoteAddr());
         } catch (Exception e) {
-            // error logged
+            errorMessage = e.getMessage();
+        }
+
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || "true".equals(request.getParameter("ajax"))) {
+            com.devflow.model.Idea updated = ideaService.getIdeaById(ideaId, currentUser.getId());
+            java.util.Map<String, Object> resp = new java.util.HashMap<>();
+            resp.put("success", success);
+            if (!success && errorMessage != null) {
+                resp.put("error", errorMessage);
+            }
+            resp.put("upvotes", updated != null ? updated.getUpvotes() : 0);
+            resp.put("downvotes", updated != null ? updated.getDownvotes() : 0);
+            resp.put("userVote", updated != null ? updated.getUserVote() : vote);
+            resp.put("vote", vote);
+            com.devflow.util.JsonUtil.sendJsonResponse(response, resp);
+            return;
         }
 
         response.sendRedirect(request.getContextPath() + "/ideas?action=view&id=" + ideaId);
@@ -255,6 +290,18 @@ public class IdeaController extends HttpServlet {
         String comment = request.getParameter("comment");
 
         ideaService.addComment(ideaId, currentUser.getId(), comment);
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || "true".equals(request.getParameter("ajax"))) {
+            java.util.Map<String, Object> resp = new java.util.HashMap<>();
+            resp.put("success", true);
+            resp.put("authorName", currentUser.getFullName());
+            String initial = currentUser.getFullName() != null && !currentUser.getFullName().isEmpty()
+                    ? currentUser.getFullName().substring(0, 1).toUpperCase() : "U";
+            resp.put("initial", initial);
+            resp.put("createdAt", "Just now");
+            resp.put("comment", comment);
+            com.devflow.util.JsonUtil.sendJsonResponse(response, resp);
+            return;
+        }
         response.sendRedirect(request.getContextPath() + "/ideas?action=view&id=" + ideaId);
     }
 

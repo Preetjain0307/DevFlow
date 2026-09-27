@@ -21,6 +21,7 @@ public interface MeetingService {
     List<MeetingParticipant> getParticipants(int meetingId);
 
     // Notes & AI Summarization
+    boolean saveMeetingNotes(int meetingId, String rawNotes, int userId);
     MeetingNote generateAndSaveAiSummary(int meetingId, String rawNotes, int userId);
     MeetingNote getMeetingNotes(int meetingId);
 

@@ -25,6 +25,17 @@ public class MilestoneController extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String projectIdStr = request.getParameter("projectId");
+        if (projectIdStr != null && !projectIdStr.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/projects?action=view&id=" + projectIdStr);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/projects");
+        }
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");

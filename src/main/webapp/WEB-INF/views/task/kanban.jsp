@@ -36,12 +36,15 @@
             <!-- TODO Column -->
             <div class="kanban-column flex-fill" style="min-width: 280px; max-width: 340px;">
                 <div class="kanban-header d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded border-start border-4 border-warning">
-                    <span class="fw-bold">To Do</span>
-                    <span class="badge bg-secondary rounded-pill" id="count-TODO">${todoTasks.size()}</span>
+                    <span class="fw-bold"><i class="bi bi-circle me-1 text-warning"></i> To Do</span>
+                    <span class="badge bg-secondary rounded-pill kanban-column-count" id="count-TODO">${todoTasks.size()}</span>
                 </div>
-                <div class="kanban-droppable p-2 bg-light rounded shadow-sm" data-status="TODO" style="min-height: 500px; background-color: #f8fafc;">
+                <div class="kanban-droppable kanban-cards-container p-2 rounded shadow-sm" data-status="TODO" style="min-height: 520px;">
+                    <div class="kanban-empty-hint text-center py-4 text-muted small ${todoTasks.size() > 0 ? 'd-none' : ''}">
+                        <i class="bi bi-inbox d-block fs-3 mb-1 opacity-50"></i>No tasks to do
+                    </div>
                     <c:forEach var="task" items="${todoTasks}">
-                        <div class="kanban-card card mb-2 shadow-sm border-0" draggable="true" data-task-id="${task.taskId}">
+                        <div class="kanban-card card mb-2 shadow-sm border-0" draggable="true" data-task-id="${task.taskId}" data-task-key="${task.taskKey}" data-task-title="${task.title}">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="badge bg-secondary" style="font-size: 11px;">${task.taskKey}</span>
@@ -52,8 +55,8 @@
                                 </h6>
                                 <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top text-muted small">
                                     <span><i class="bi bi-person me-1"></i>${task.assigneeName != null ? task.assigneeName : 'Unassigned'}</span>
-                                    <c:if test="${task.storyPoints > 0}">
-                                        <span class="badge bg-light text-dark border">${task.storyPoints} pts</span>
+                                    <c:if test="${task.estimatedHours != null}">
+                                        <span class="badge bg-light text-dark border">${task.estimatedHours} hrs</span>
                                     </c:if>
                                 </div>
                             </div>
@@ -65,12 +68,15 @@
             <!-- IN_PROGRESS Column -->
             <div class="kanban-column flex-fill" style="min-width: 280px; max-width: 340px;">
                 <div class="kanban-header d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded border-start border-4 border-primary">
-                    <span class="fw-bold">In Progress</span>
-                    <span class="badge bg-primary rounded-pill" id="count-IN_PROGRESS">${inProgressTasks.size()}</span>
+                    <span class="fw-bold"><i class="bi bi-play-circle-fill me-1 text-primary"></i> In Progress</span>
+                    <span class="badge bg-primary rounded-pill kanban-column-count" id="count-IN_PROGRESS">${inProgressTasks.size()}</span>
                 </div>
-                <div class="kanban-droppable p-2 bg-light rounded shadow-sm" data-status="IN_PROGRESS" style="min-height: 500px; background-color: #f8fafc;">
+                <div class="kanban-droppable kanban-cards-container p-2 rounded shadow-sm" data-status="IN_PROGRESS" style="min-height: 520px;">
+                    <div class="kanban-empty-hint text-center py-4 text-muted small ${inProgressTasks.size() > 0 ? 'd-none' : ''}">
+                        <i class="bi bi-inbox d-block fs-3 mb-1 opacity-50"></i>No tasks in progress
+                    </div>
                     <c:forEach var="task" items="${inProgressTasks}">
-                        <div class="kanban-card card mb-2 shadow-sm border-0" draggable="true" data-task-id="${task.taskId}">
+                        <div class="kanban-card card mb-2 shadow-sm border-0" draggable="true" data-task-id="${task.taskId}" data-task-key="${task.taskKey}" data-task-title="${task.title}">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="badge bg-secondary" style="font-size: 11px;">${task.taskKey}</span>
@@ -81,8 +87,8 @@
                                 </h6>
                                 <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top text-muted small">
                                     <span><i class="bi bi-person me-1"></i>${task.assigneeName != null ? task.assigneeName : 'Unassigned'}</span>
-                                    <c:if test="${task.storyPoints > 0}">
-                                        <span class="badge bg-light text-dark border">${task.storyPoints} pts</span>
+                                    <c:if test="${task.estimatedHours != null}">
+                                        <span class="badge bg-light text-dark border">${task.estimatedHours} hrs</span>
                                     </c:if>
                                 </div>
                             </div>
@@ -94,12 +100,15 @@
             <!-- IN_REVIEW Column -->
             <div class="kanban-column flex-fill" style="min-width: 280px; max-width: 340px;">
                 <div class="kanban-header d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded border-start border-4 border-info">
-                    <span class="fw-bold">In Review</span>
-                    <span class="badge bg-info text-dark rounded-pill" id="count-IN_REVIEW">${inReviewTasks.size()}</span>
+                    <span class="fw-bold"><i class="bi bi-eye-fill me-1 text-info"></i> In Review</span>
+                    <span class="badge bg-info text-dark rounded-pill kanban-column-count" id="count-IN_REVIEW">${inReviewTasks.size()}</span>
                 </div>
-                <div class="kanban-droppable p-2 bg-light rounded shadow-sm" data-status="IN_REVIEW" style="min-height: 500px; background-color: #f8fafc;">
+                <div class="kanban-droppable kanban-cards-container p-2 rounded shadow-sm" data-status="IN_REVIEW" style="min-height: 520px;">
+                    <div class="kanban-empty-hint text-center py-4 text-muted small ${inReviewTasks.size() > 0 ? 'd-none' : ''}">
+                        <i class="bi bi-inbox d-block fs-3 mb-1 opacity-50"></i>No tasks in review
+                    </div>
                     <c:forEach var="task" items="${inReviewTasks}">
-                        <div class="kanban-card card mb-2 shadow-sm border-0" draggable="true" data-task-id="${task.taskId}">
+                        <div class="kanban-card card mb-2 shadow-sm border-0" draggable="true" data-task-id="${task.taskId}" data-task-key="${task.taskKey}" data-task-title="${task.title}">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="badge bg-secondary" style="font-size: 11px;">${task.taskKey}</span>
@@ -110,8 +119,8 @@
                                 </h6>
                                 <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top text-muted small">
                                     <span><i class="bi bi-person me-1"></i>${task.assigneeName != null ? task.assigneeName : 'Unassigned'}</span>
-                                    <c:if test="${task.storyPoints > 0}">
-                                        <span class="badge bg-light text-dark border">${task.storyPoints} pts</span>
+                                    <c:if test="${task.estimatedHours != null}">
+                                        <span class="badge bg-light text-dark border">${task.estimatedHours} hrs</span>
                                     </c:if>
                                 </div>
                             </div>
@@ -120,15 +129,18 @@
                 </div>
             </div>
 
-            <!-- DONE Column -->
+            <!-- COMPLETED Column -->
             <div class="kanban-column flex-fill" style="min-width: 280px; max-width: 340px;">
                 <div class="kanban-header d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded border-start border-4 border-success">
-                    <span class="fw-bold">Done</span>
-                    <span class="badge bg-success rounded-pill" id="count-DONE">${doneTasks.size()}</span>
+                    <span class="fw-bold"><i class="bi bi-check-circle-fill me-1 text-success"></i> Done</span>
+                    <span class="badge bg-success rounded-pill kanban-column-count" id="count-COMPLETED">${completedTasks.size()}</span>
                 </div>
-                <div class="kanban-droppable p-2 bg-light rounded shadow-sm" data-status="DONE" style="min-height: 500px; background-color: #f8fafc;">
-                    <c:forEach var="task" items="${doneTasks}">
-                        <div class="kanban-card card mb-2 shadow-sm border-0 opacity-75" draggable="true" data-task-id="${task.taskId}">
+                <div class="kanban-droppable kanban-cards-container p-2 rounded shadow-sm" data-status="COMPLETED" style="min-height: 520px;">
+                    <div class="kanban-empty-hint text-center py-4 text-muted small ${completedTasks.size() > 0 ? 'd-none' : ''}">
+                        <i class="bi bi-inbox d-block fs-3 mb-1 opacity-50"></i>No completed tasks
+                    </div>
+                    <c:forEach var="task" items="${completedTasks}">
+                        <div class="kanban-card card mb-2 shadow-sm border-0 opacity-75" draggable="true" data-task-id="${task.taskId}" data-task-key="${task.taskKey}" data-task-title="${task.title}">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="badge bg-secondary" style="font-size: 11px;">${task.taskKey}</span>
@@ -139,8 +151,8 @@
                                 </h6>
                                 <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top text-muted small">
                                     <span><i class="bi bi-person me-1"></i>${task.assigneeName != null ? task.assigneeName : 'Unassigned'}</span>
-                                    <c:if test="${task.storyPoints > 0}">
-                                        <span class="badge bg-light text-dark border">${task.storyPoints} pts</span>
+                                    <c:if test="${task.estimatedHours != null}">
+                                        <span class="badge bg-light text-dark border">${task.estimatedHours} hrs</span>
                                     </c:if>
                                 </div>
                             </div>
